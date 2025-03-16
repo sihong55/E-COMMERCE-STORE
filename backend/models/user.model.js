@@ -40,8 +40,6 @@ const userSchema = new mongoose.Schema({
     }
 );
 
-const User = mongoose.model("User", userSchema);
-
 //pre save hook to hash the password before saving the user model
 //password는 사용자가 입력한 비밀번호, this.password는 userSchema에 정의된 password
 //this.isModified("password")는 password가 수정되었는지 확인하는 함수
@@ -56,9 +54,13 @@ userSchema.pre("save", async function (next) {
         next(error);
     }   
 });
-
+//this는 현재 저장하거나 수정 중인 특정 문서(객체) 자체를 의미!
+//추후에 사용할 함수, 입력된 값과 데이터베이스에 저장된 값이 일치하는지 확인
+//this.password는 userSchema에 정의된 password
 userSchema.methods.comparePassword = async function (password) {
-    return await bcrypt.compare(password, this.password);
+    return bcrypt.compare(password, this.password);
 }
+
+const User = mongoose.model("User", userSchema);
 
 export default User;
